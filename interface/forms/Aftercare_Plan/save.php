@@ -34,8 +34,7 @@ require_once("$srcdir/formdata.inc.php");
 if (! $encounter) { // comes from globals.php
  die(xl("Internal error: we do not seem to be in an encounter!"));
 }
-
-$id = formData('id','G') + 0;
+$id = 0 + (isset($_GET['id']) ? $_GET['id'] : '');
 
 $sets = "pid = {$_SESSION["pid"]},
   groupname = '" . $_SESSION["authProvider"] . "',
@@ -55,11 +54,11 @@ $sets = "pid = {$_SESSION["pid"]},
 
   
   if (empty($id)) {
-  $newid = sqlInsert("INSERT INTO form_aftercareplan SET $sets");
-  addForm($encounter, "AfterCare Plan", $newid, "Aftercare_Plan", $pid, $userauthorized);
+  $newid = sqlInsert("INSERT INTO form_aftercare_plan SET $sets");
+  addForm($encounter, "Aftercare Plan", $newid, "aftercare_plan", $pid, $userauthorized);
 }
 else {
-  sqlStatement("UPDATE form_aftercareplan SET $sets WHERE id = '". add_escape_custom("$id"). "'");
+  sqlStatement("UPDATE form_aftercare_plan SET $sets WHERE id = '". add_escape_custom("$id"). "'");
 }
 
 $_SESSION["encounter"] = htmlspecialchars($encounter);

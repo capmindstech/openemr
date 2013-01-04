@@ -19,17 +19,12 @@
  * @link    http://www.open-emr.org
  */
  
-//SANITIZE ALL ESCAPES
- $sanitize_all_escapes=true;
-
- //STOP FAKE REGISTER GLOBALS
- $fake_register_globals=false;
  
 include_once("../../globals.php");
 include_once($GLOBALS["srcdir"]."/api.inc");
-function Treatment_Plan_report( $pid, $encounter, $cols, $id) {
+function treatment_plan_report( $pid, $encounter, $cols, $id) {
 $count = 0;
-$data = formFetch("form_treatmentplan", $id);
+$data = formFetch("form_treatment_plan", $id);
 if ($data) {
 print "<table><tr>";
 foreach($data as $key => $value) {
@@ -40,7 +35,7 @@ if ($value == "on") {
 $value = "yes";
 }
 $key=ucwords(str_replace("_"," ",$key));
-print "<td><span class=bold>".xlt($key). ": </span><span class=text>$value</span></td>";
+print "<td><span class=bold>".xlt($key). ": </span><span class=text>".text($value)."</span></td>";
 $count++;
 if ($count == $cols) {
 $count = 0;

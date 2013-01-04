@@ -1,8 +1,8 @@
 --
--- Table structure for table `form_aftercareplan`
+-- Table structure for table `form_aftercare_plan`
 --
 
-CREATE TABLE IF NOT EXISTS `form_aftercareplan` (
+CREATE TABLE IF NOT EXISTS `form_aftercare_plan` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
   `pid` bigint(20) DEFAULT NULL,
