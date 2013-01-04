@@ -33,8 +33,8 @@ require_once("$srcdir/options.inc.php");
 require_once("$srcdir/htmlspecialchars.inc.php");
 formHeader("Form:AfterCare Planning");
 $returnurl = $GLOBALS['concurrent_layout'] ? 'encounter_top.php' : 'patient_encounter.php';
-$formid   = 0 + formData('id', 'G');
-$obj = $formid ? formFetch("form_aftercareplan", $formid) : array();
+$formid = 0 + (isset($_GET['id']) ? $_GET['id'] : '');
+$obj = $formid ? formFetch("form_aftercare_plan", $formid) : array();
 
 ?>
 <html>
@@ -55,7 +55,7 @@ $obj = $formid ? formFetch("form_aftercareplan", $formid) : array();
 </br>
 <?php
 echo "<form method='post' name='my_form' " .
-  "action='$rootdir/forms/Aftercare_Plan/save.php?id=$formid'>\n";
+  "action='$rootdir/forms/aftercare_plan/save.php?id=attr($formid)'>\n";
 ?>
 <table  border="0">
 <tr>
@@ -65,7 +65,7 @@ echo "<form method='post' name='my_form' " .
     
     $result = getPatientData($pid, "fname,lname,squad");
    echo htmlspecialchars(text($result['fname'])." ".text($result['lname']));}
-   $patient_name=text($result['fname'])." ".text($result['lname']);
+   $patient_name=($result['fname'])." ".($result['lname']);
    ?>
    </label>
    <input type="hidden" name="client_name" value="<?php echo attr($patient_name);?>">
@@ -87,7 +87,9 @@ echo "<form method='post' name='my_form' " .
 		
   <td align="left" class="forms"><?php echo xlt('Admit Date'); ?>:</td>
 		<td class="forms">
-			   <input type='text' size='10' name='admit_date' id='admission_date' <?php echo attr($disabled); ?>; value='<?php echo stripslashes($obj{"admit_date"}); ?>'   title='<?php echo xla('yyyy-mm-dd Date of service'); ?>'
+			   <input type='text' size='10' name='admit_date' id='admission_date' <?php echo attr($disabled); ?>;
+			   value='<?php echo attr(stripslashes($obj{"admit_date"})); ?>'   
+			   title='<?php echo xla('yyyy-mm-dd Date of service'); ?>'
        onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
         <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
         id='img_admission_date' border='0' alt='[?]' style='cursor:pointer;cursor:hand'
@@ -99,7 +101,7 @@ echo "<form method='post' name='my_form' " .
 		<td align="left" class="forms"><?php echo xl('Discharged'); ?>:</td>
 		<td class="forms">
 			   <input type='text' size='10' name='discharged' id='discharge_date' <?php echo attr($disabled); ?>;
-      value='<?php echo stripslashes($obj{"discharged"}); ?>'
+      value='<?php echo attr(stripslashes($obj{"discharged"})); ?>'
        title='<?php echo xla('yyyy-mm-dd Date of service'); ?>'
        onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
         <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
@@ -125,17 +127,17 @@ echo "<form method='post' name='my_form' " .
 	</tr>
 	<tr>
 		<td align="right" class="forms">1.</td>
-		<td colspan="3"><textarea name="goal_a_acute_intoxication" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_a_acute_intoxication"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_a_acute_intoxication" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_a_acute_intoxication"});?></textarea></td>
 		
 	</tr>
 	<tr>
 		<td align="right" class="forms">2.</td>
-		<td colspan="3"><textarea name="goal_a_acute_intoxication_I" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_a_acute_intoxication_I"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_a_acute_intoxication_I" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_a_acute_intoxication_I"});?></textarea></td>
 		
 	</tr>
 	<tr>
 		<td align="right" class="forms">3.</td>
-		<td colspan="3"><textarea name="goal_a_acute_intoxication_II" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_a_acute_intoxication_II"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_a_acute_intoxication_II" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_a_acute_intoxication_II"});?></textarea></td>
 		
 	
 	<tr>
@@ -145,12 +147,12 @@ echo "<form method='post' name='my_form' " .
 	</tr>
 	<tr>
 		<td align="right" class="forms">1.</td>
-		<td colspan="3"><textarea name="goal_b_emotional_behavioral_conditions" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_b_emotional_behavioral_conditions"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_b_emotional_behavioral_conditions" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_b_emotional_behavioral_conditions"});?></textarea></td>
 		
 	</tr>
 	<tr>
 		<td align="right" class="forms">2.</td>
-		<td colspan="3"><textarea name="goal_b_emotional_behavioral_conditions_I" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_b_emotional_behavioral_conditions_I"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_b_emotional_behavioral_conditions_I" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_b_emotional_behavioral_conditions_I"});?></textarea></td>
 		
 	</tr>
 	
@@ -160,12 +162,12 @@ echo "<form method='post' name='my_form' " .
 	</tr>
 	<tr>
 		<td align="right" class="forms">1.</td>
-		<td colspan="3"><textarea name="goal_c_relapse_potential" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_c_relapse_potential"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_c_relapse_potential" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_c_relapse_potential"});?></textarea></td>
 		
 	</tr>
 	<tr>
 		<td align="right" class="forms">2.</td>
-		<td colspan="3"><textarea name="goal_c_relapse_potential_I" rows="2" cols="80" wrap="virtual name"><?php echo stripslashes($obj{"goal_c_relapse_potential_I"});?></textarea></td>
+		<td colspan="3"><textarea name="goal_c_relapse_potential_I" rows="2" cols="80" wrap="virtual name"><?php echo text($obj{"goal_c_relapse_potential_I"});?></textarea></td>
 		
 	</tr>
 

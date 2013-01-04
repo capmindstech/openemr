@@ -1,8 +1,8 @@
 --
--- Table structure for table `form_transfersummary`
+-- Table structure for table `form_transfer_summary`
 --
 
-CREATE TABLE IF NOT EXISTS `form_transfersummary` (
+CREATE TABLE IF NOT EXISTS `form_transfer_summary` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
   `pid` bigint(20) DEFAULT NULL,

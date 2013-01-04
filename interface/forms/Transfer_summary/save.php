@@ -33,7 +33,8 @@ if (! $encounter) { // comes from globals.php
  die(xl("Internal error: we do not seem to be in an encounter!"));
 }
 
-$id = formData('id','G') + 0;
+
+$id = 0 + (isset($_GET['id']) ? $_GET['id'] : '');
 
 $sets = "pid = {$_SESSION["pid"]},
   groupname = '" . $_SESSION["authProvider"] . "',
@@ -50,11 +51,11 @@ $sets = "pid = {$_SESSION["pid"]},
 
   
   if (empty($id)) {
-  $newid = sqlInsert("INSERT INTO form_transfersummary SET $sets");
-  addForm($encounter, "Transfer Summary", $newid, "Transfer_summary", $pid, $userauthorized);
+  $newid = sqlInsert("INSERT INTO form_transfer_summary SET $sets");
+  addForm($encounter, "Transfer Summary", $newid, "transfer_summary", $pid, $userauthorized);
 }
 else {
-  sqlStatement("UPDATE form_transfersummary SET $sets WHERE id = '". add_escape_custom("$id"). "'");
+  sqlStatement("UPDATE form_transfer_summary SET $sets WHERE id = '". add_escape_custom("$id"). "'");
 }
 
 $_SESSION["encounter"] = htmlspecialchars($encounter);
