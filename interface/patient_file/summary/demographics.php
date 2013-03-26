@@ -22,6 +22,7 @@ $fake_register_globals=false;
  require_once("../history/history.inc.php");
  require_once("$srcdir/formatting.inc.php");
  require_once("$srcdir/edi.inc");
+ require_once("$srcdir/invoice_summary.inc.php");
  require_once("$srcdir/clinical_rules.php");
 
   if ($GLOBALS['concurrent_layout'] && isset($_GET['set_pid'])) {
@@ -589,21 +590,64 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
 ?>
         <br>
 <?php
+		//PATIENT BALANCE,INS BALANCE naina@capminds.com
+		
+		$rez=Sqlstatement("SELECT f.id, f.pid, f.encounter, f.date, " .
+      "f.last_level_billed, f.last_level_closed, f.last_stmt_date, f.stmt_count, " .
+      "p.fname, p.mname, p.lname, p.pubpid, p.genericname2, p.genericval2, " .
+      "( SELECT SUM(b.fee) FROM billing AS b WHERE " .
+      "b.pid = f.pid AND b.encounter = f.encounter AND " .
+      "b.activity = 1 AND code_type !='COPAY' )AS charges, " .
+      "( SELECT SUM(b.fee) FROM billing AS b WHERE " .
+      "b.pid = f.pid AND b.encounter = f.encounter AND " .
+      "b.activity = 1 AND b.code_type = 'COPAY' ) AS copays, " .
+      "( SELECT SUM(a.pay_amount) FROM ar_activity AS a WHERE " .
+      "a.pid = f.pid AND a.encounter = f.encounter ) AS payments, " .
+      "( SELECT SUM(a.adj_amount) FROM ar_activity AS a WHERE " .
+      "a.pid = f.pid AND a.encounter = f.encounter ) AS adjustments " .
+      "FROM form_encounter AS f " .
+      "JOIN patient_data AS p ON p.pid = f.pid " .
+      "WHERE p.pid='$pid'" .
+      "ORDER BY p.lname, p.fname, p.mname, f.pid, f.encounter");
+	   while ($row = sqlFetchArray($rez)) {
+	   $encounter_balance=$row['charges']+ $row['copays'] - $row['payments'] - $row['adjustments'];
+	   if($encounter_balance)
+	   {
+	   $responsible=ar_responsible_party($pid,$row['encounter']);
+	   if($responsible==0) //patient responsibility
+	   {
+	   $patientbalance+=$encounter_balance;
+	   }
+	   else
+	   {
+	   $insurancebalance+=$encounter_balance;
+	   }
+	   }
+	   }
+	   $totalbalance=$patientbalance + $insurancebalance;
  if ($GLOBALS['oer_config']['ws_accounting']['enabled']) {
  // Show current balance and billing note, if any.
-  echo "        <div style='margin-left: 10px; margin-right: 10px'>" .
-   "<span class='bold'><font color='#ee6600'>" .
-   htmlspecialchars(xl('Balance Due'),ENT_NOQUOTES) .
-   ": " . htmlspecialchars(oeFormatMoney(get_patient_balance($pid)),ENT_NOQUOTES) .
-   "</font></span><br>";
+  echo "<table width='600'><tr><td><div style='margin-left: 10px; margin-right: 10px'>" .
+  "<table width='550'><tr><td><span class='bold'><font color='red' size='3px'>" .
+   htmlspecialchars(xl('Patient Balance Due'),ENT_NOQUOTES) .
+   " : " . htmlspecialchars(oeFormatMoney($patientbalance),ENT_NOQUOTES) .
+   "</font></span></td></tr>".
+     "<tr><td><span class='bold'><font color='red' size='3px'>" .
+   htmlspecialchars(xl('Insurance Balance Due'),ENT_NOQUOTES) .
+   " : " . htmlspecialchars(oeFormatMoney($insurancebalance),ENT_NOQUOTES) .
+   "</font></span></td></tr>".
+   "<tr><td><span class='bold'><font color='red' size='3px'>" .
+   htmlspecialchars(xl('Total Balance Due'),ENT_NOQUOTES) .
+   " : " . htmlspecialchars(oeFormatMoney($totalbalance),ENT_NOQUOTES) .
+   "</font></span></td></td></tr>";
   if ($result['genericname2'] == 'Billing') {
-   echo "<span class='bold'><font color='red'>" .
+   echo "<tr><td><span class='bold'><font color='red'>" .
     htmlspecialchars(xl('Billing Note'),ENT_NOQUOTES) . ":" .
     htmlspecialchars($result['genericval2'],ENT_NOQUOTES) .
-    "</font></span><br>";
+    "</font></span></td></tr>";
   } 
   if ($result3['provider']) {   // Use provider in case there is an ins record w/ unassigned insco
-   echo "<span class='bold'>" .
+   echo "<tr><td><span class='bold'>" .
     htmlspecialchars(xl('Primary Insurance'),ENT_NOQUOTES) . ': ' . htmlspecialchars($insco_name,ENT_NOQUOTES) .
     "</span>&nbsp;&nbsp;&nbsp;";
    if ($result3['copay'] > 0) {
@@ -613,9 +657,9 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
    }
    echo "<span class='bold'>" .
     htmlspecialchars(xl('Effective Date'),ENT_NOQUOTES) . ': ' .  htmlspecialchars(oeFormatShortDate($result3['effdate'],ENT_NOQUOTES)) .
-    "</span>";
+    "</span></td></tr>";
   }
-  echo "</div><br>";
+  echo "</table></td></tr></td></tr></table></div><br>";
  }
 ?>
         </div> <!-- required for expand_collapse_widget -->
